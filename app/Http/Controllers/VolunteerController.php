@@ -11,11 +11,25 @@ class VolunteerController extends Controller
     /**
      * Display a listing of the volunteers.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $volunteers = User::where('role', 'volunteer')->get();
+        $query = User::where('role', 'volunteer');
+
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $searchType = $request->input('search_type');
+
+            if ($searchType == 'name') {
+                $query->where('name', 'like', "%$search%");
+            } elseif ($searchType == 'email') {
+                $query->where('email', 'like', "%$search%");
+            }
+        }
+
+        $volunteers = $query->paginate(10);
         return view('volunteers.index', compact('volunteers'));
     }
+
 
     /**
      * Show the form for creating a new volunteer.

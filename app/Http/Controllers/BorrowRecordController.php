@@ -14,7 +14,7 @@ class BorrowRecordController extends Controller
      */
     public function index(Request $request)
     {
-        $query = BorrowRecord::with('book');
+        $query = BorrowRecord::with('book', 'member');
 
         if ($request->has('search')) {
             $search = $request->input('search');
@@ -29,9 +29,21 @@ class BorrowRecordController extends Controller
             }
         }
 
-        $borrowRecords = $query->paginate(10);
-        return view('borrow_records.index', compact('borrowRecords'));
+        // Get today's date
+        $today = \Carbon\Carbon::today()->toDateString();
+
+        // Separate records into checked out and history
+        $checkedOutRecords = $query->whereNull('return_date')->paginate(10, ['*'], 'checked-out');
+        $historyRecords = BorrowRecord::with('book', 'member')
+            ->whereNotNull('return_date')
+            ->where('return_date', '<=', $today)
+            ->paginate(10, ['*'], 'history');
+
+        return view('borrow_records.index', compact('checkedOutRecords', 'historyRecords'));
     }
+
+
+
 
 
 
