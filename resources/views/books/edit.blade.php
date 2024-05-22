@@ -1,6 +1,85 @@
 @extends('layouts.app')
 
 @section('content')
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        h1, h2 {
+            color: #343a40;
+        }
+
+        .card {
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-title {
+            color: #343a40;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+        }
+
+        .card-img-top {
+            border-radius: 10px 10px 0 0;
+        }
+
+        .overflow-auto {
+            white-space: nowrap;
+        }
+
+        .mr-3 {
+            margin-right: 1rem !important;
+        }
+
+        .table .badge {
+            display: inline-block;
+            padding: 0.5em 1em;
+            font-size: 0.9em;
+            font-weight: 600;
+            border-radius: 50px;
+            text-align: center;
+            vertical-align: middle;
+            white-space: nowrap;
+            background-color: #e9ecef;
+            color: #495057;
+        }
+
+        .table .badge-available {
+            background-color: #e9ecef;
+            color: #28a745;
+        }
+
+        .table .badge-checked-out {
+            background-color: #e9ecef;
+            color: #dc3545;
+        }
+
+        .input-group {
+            border-radius: 5px;
+        }
+
+        .input-group-append .btn {
+            border-radius: 0 5px 5px 0;
+        }
+    </style>
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">

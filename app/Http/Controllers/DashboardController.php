@@ -22,6 +22,6 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        return view('welcome', compact('totalBooks', 'totalMembers', 'totalCheckouts', 'recentCheckouts', 'recentBooks'));
+        return view('dashboard', compact('totalBooks', 'totalMembers', 'totalCheckouts', 'recentCheckouts', 'recentBooks'));
     }
 }

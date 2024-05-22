@@ -17,10 +17,13 @@ return new class extends Migration
             $table->unsignedBigInteger('member_id');
             $table->date('borrow_date');
             $table->date('return_date')->nullable();
+            $table->enum('status', ['returned', 'overdue', 'not confirmed'])->default('not confirmed');
+
             $table->timestamps();
 
             $table->foreign('book_id')->references('id')->on('books')->onDelete('cascade');
             $table->foreign('member_id')->references('id')->on('members')->onDelete('cascade');
+
         });
     }
 

@@ -1,50 +1,57 @@
 @extends('layouts.app')
 
 @section('content')
+
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-12">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h1>Books</h1>
-                    <a href="{{ route('books.create') }}" class="btn btn-primary">Add New Book</a>
-                </div>
-                <div class="row">
-                    @foreach($books as $book)
-                        <div class="col-md-4 mb-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ $book->title }}</h5>
-                                    <h6 class="card-subtitle mb-2 text-muted">Author: {{ $book->author }}</h6>
-                                    <p class="card-text">
-                                        <strong>Publisher:</strong> {{ $book->publisher_name }}<br>
-                                        <strong>Published Year:</strong> {{ $book->published_year }}<br>
-                                        <strong>Category:</strong> {{ $book->category }}
-                                    </p>
-                                    <a href="{{ route('books.show', $book->id) }}" class="btn btn-outline-primary btn-sm">View Details</a>
-                                </div>
-                                <div class="card-footer">
-                                    <small class="text-muted">
-                                        Borrowed by:
-                                        <ul class="list-unstyled mb-0">
-                                            @foreach($book->borrowRecords as $record)
-                                                <li>{{ $record->member->name }},
-                                                    @if ($record->return_date)
-                                                        Return Date: {{ $record->return_date }}
-                                                    @else
-                                                        Not returned yet
-                                                    @endif
-                                                </li>
-                                            @endforeach
-                                        </ul>
-                                    </small>
-                                </div>
-                            </div>
+        <h1 class="mb-4 text-center">Manage your library</h1>
+
+        <div class="row mb-4">
+            <div class="col-md-8 mx-auto d-flex justify-content-between">
+                <form action="{{ route('books.index') }}" method="GET" class="d-flex flex-grow-1">
+                    <div class="input-group flex-grow-1">
+                        <input type="text" name="search" class="form-control" placeholder="Search for a book" value="{{ request()->query('search') }}">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-primary">Search</button>
                         </div>
+                    </div>
+                </form>
+                <a href="{{ route('books.create') }}" class="btn btn-success add-book-btn ms-2">Add New Book</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Authors</th>
+                        <th>Availability</th>
+                        <th>Publish Date</th>
+                        <th>Category</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($books as $book)
+                        <tr>
+                            <td>{{ $book->title }}</td>
+                            <td>{{ $book->author }}</td>
+                            <td>
+                                @if($book->borrowRecords->whereNull('return_date')->count() > 0)
+                                    <span class="badge badge-checked-out">Checked out</span>
+                                @else
+                                    <span class="badge badge-available">Available</span>
+                                @endif
+                            </td>
+                            <td>{{ $book->published_year }}</td>
+                            <td>{{ $book->category }}</td>
+                            <td><a href="{{ route('books.edit', $book->id) }}" class="btn btn-primary btn-sm">Edit</a></td>
+                        </tr>
                     @endforeach
-                </div>
-                <div class="d-flex justify-content-center mt-4">
-                    {{ $books->links('pagination::bootstrap-4') }}
-                </div>
+                    </tbody>
+                </table>
+                {{ $books->links() }}
             </div>
         </div>
     </div>

@@ -14,23 +14,22 @@ class BorrowRecordController extends Controller
      */
     public function index(Request $request)
     {
-        $searchCriteria = $request->input('search_criteria');
-        $search = $request->input('search');
+        $query = BorrowRecord::with('book');
 
-        $borrowRecords = BorrowRecord::with(['book', 'member'])
-            ->when($search, function ($query) use ($searchCriteria, $search) {
-                if ($searchCriteria === 'book_id') {
-                    return $query->whereHas('book', function ($query) use ($search) {
-                        $query->where('id', $search);
-                    });
-                } elseif ($searchCriteria === 'ic_no') {
-                    return $query->whereHas('member', function ($query) use ($search) {
-                        $query->where('ic_no', 'like', "%$search%");
-                    });
-                }
-            })
-            ->paginate(10);
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $searchType = $request->input('search_type');
 
+            if ($searchType == 'book_id') {
+                $query->whereHas('book', function ($q) use ($search) {
+                    $q->where('id', 'like', "%$search%");
+                });
+            } elseif ($searchType == 'ic_no') {
+                $query->where('ic_no', 'like', "%$search%");
+            }
+        }
+
+        $borrowRecords = $query->paginate(10);
         return view('borrow_records.index', compact('borrowRecords'));
     }
 

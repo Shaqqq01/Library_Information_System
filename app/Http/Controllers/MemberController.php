@@ -10,11 +10,12 @@ class MemberController extends Controller
     /**
      * Display a listing of the members.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $members = Member::paginate(9);
+        $members = Member::all();
         return view('members.index', compact('members'));
     }
+
 
     /**
      * Show the form for creating a new member.
@@ -44,9 +45,11 @@ class MemberController extends Controller
     /**
      * Display the specified member.
      */
-    public function show(Member $member)
+    public function show($id)
     {
-        return view('members.show', compact('member'));
+        $members = Member::all();
+        $selectedMember = Member::with('borrowRecords.book', 'fines')->findOrFail($id);
+        return view('members.index', compact('members', 'selectedMember'));
     }
 
     /**

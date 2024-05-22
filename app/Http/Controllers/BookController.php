@@ -10,11 +10,16 @@ class BookController extends Controller
     /**
      * Display a listing of the books.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $books = Book::with('borrowRecords.member')->paginate(9); // 10 items per page
-        return view('books.index', compact('books'));
+        $search = $request->input('search');
+        $books = Book::where('title', 'like', "%{$search}%")
+            ->orWhere('author', 'like', "%{$search}%")
+            ->paginate(10);
+
+        return view('books.index', compact('books', 'search'));
     }
+
 
     /**
      * Show the form for creating a new book.

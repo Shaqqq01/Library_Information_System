@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,7 +28,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        return $this->authenticated($request, Auth::user());
     }
 
     /**
@@ -44,5 +43,16 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/');
+    }
+
+    protected function authenticated(Request $request, $user): RedirectResponse
+    {
+        if ($user->hasRole('supervisor')) {
+            return redirect()->route('volunteers.index');
+        } elseif ($user->hasRole('volunteer')) {
+            return redirect()->route('dashboard');
+        }
+
+        return redirect()->route('defaultRoute'); // fallback route if no roles match
     }
 }
