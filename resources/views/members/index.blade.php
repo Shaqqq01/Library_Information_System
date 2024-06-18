@@ -1,22 +1,38 @@
 @extends('layouts.app')
 
 @section('content')
-
-
     <div class="container">
         <div class="row">
             <div class="col-md-4 member-list">
-                <div class="search-bar input-group">
-                    <input type="text" class="form-control" placeholder="Search by name">
-                    <button class="btn btn-primary">Search</button>
+                <div class="d-flex align-items-center mb-3">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search by name">
+                        <button class="btn btn-primary"><i class="fas fa-search"></i></button>
+                    </div>
+                    <a href="{{ route('members.create') }}" class="btn btn-success ms-2 add-member-btn">
+                        <i class="fas fa-plus"></i>Add Member
+                    </a>
                 </div>
                 <ul class="list-group">
                     @foreach($members as $member)
-                        <a href="{{ route('members.show', $member->id) }}" class="list-group-item list-group-item-action">
-                            <div>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <a href="{{ route('members.show', $member->id) }}">
                                 <h5>{{ $member->name }}</h5>
+                            </a>
+                            <div class="dropdown">
+                                <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton{{ $member->id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ $member->id }}">
+                                    <li><a class="dropdown-item" href="{{ route('members.edit', $member->id) }}">Edit</a></li>
+                                    <li><a class="dropdown-item text-danger" href="#" onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this member?')) { document.getElementById('delete-member-form-{{ $member->id }}').submit(); }">Delete</a></li>
+                                </ul>
                             </div>
-                        </a>
+                            <form id="delete-member-form-{{ $member->id }}" action="{{ route('members.destroy', $member->id) }}" method="POST" style="display: none;">
+                                @csrf
+                                @method('DELETE')
+                            </form>
+                        </li>
                     @endforeach
                 </ul>
             </div>

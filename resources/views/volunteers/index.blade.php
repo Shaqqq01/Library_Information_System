@@ -16,12 +16,12 @@
                         </div>
                     </div>
                 </form>
+                <a href="{{ route('volunteers.create') }}" class="btn btn-success ms-2">Add New Volunteer</a>
             </div>
         </div>
 
         <div class="card">
             <div class="card-body">
-
                 <div class="tab-content mt-4">
                     <div id="volunteers" class="tab-pane fade show active" role="tabpanel" aria-labelledby="volunteers-tab">
                         <table class="table">

@@ -28,9 +28,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Routes for books accessible to volunteers
     Route::middleware(['role:volunteer'])->group(function () {
         Route::resource('books', BookController::class);
-        Route::resource('books', BookController::class);
         Route::resource('members', MemberController::class);
         Route::resource('borrow-records', BorrowRecordController::class);
+        Route::get('/borrow-records/createLoan', [BorrowRecordController::class, 'createLoan'])->name('borrow-records.createLoan');
+        Route::post('/borrow-records/storeLoan', [BorrowRecordController::class, 'storeLoan'])->name('borrow-records.storeLoan');
     });
 });
 

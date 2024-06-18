@@ -1,13 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
-
     <div class="container">
         <h1 class="mb-4 text-center">Manage your library</h1>
 
         <div class="row mb-4">
             <div class="col-md-8 mx-auto d-flex justify-content-between">
-                <form action="{{ route('books.index') }}" method="GET" class="d-flex flex-grow-1">
+                <form id="search-form" action="{{ route('books.index') }}" method="GET" class="d-flex flex-grow-1">
                     <div class="input-group flex-grow-1">
                         <input type="text" name="search" class="form-control" placeholder="Search for a book" value="{{ request()->query('search') }}">
                         <div class="input-group-append">
@@ -51,7 +50,46 @@
                     @endforeach
                     </tbody>
                 </table>
-                {{ $books->links() }}
+                @if ($books->hasPages())
+                    <nav>
+                        <ul class="pagination justify-content-center">
+                            {{-- Previous Page Link --}}
+                            @if ($books->onFirstPage())
+                                <li class="page-item disabled" aria-disabled="true">
+                                    <span class="page-link">&laquo;</span>
+                                </li>
+                            @else
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $books->previousPageUrl() }}" rel="prev">&laquo;</a>
+                                </li>
+                            @endif
+
+                            {{-- Pagination Elements --}}
+                            @foreach ($books->links()->elements[0] as $page => $url)
+                                @if ($page == $books->currentPage())
+                                    <li class="page-item active" aria-current="page">
+                                        <span class="page-link">{{ $page }}</span>
+                                    </li>
+                                @else
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                    </li>
+                                @endif
+                            @endforeach
+
+                            {{-- Next Page Link --}}
+                            @if ($books->hasMorePages())
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $books->nextPageUrl() }}" rel="next">&raquo;</a>
+                                </li>
+                            @else
+                                <li class="page-item disabled" aria-disabled="true">
+                                    <span class="page-link">&raquo;</span>
+                                </li>
+                            @endif
+                        </ul>
+                    </nav>
+                @endif
             </div>
         </div>
     </div>

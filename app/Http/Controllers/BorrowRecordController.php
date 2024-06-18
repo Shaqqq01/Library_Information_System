@@ -1,11 +1,14 @@
 <?php
 
+
 namespace App\Http\Controllers;
+
 
 use App\Models\BorrowRecord;
 use App\Models\Book;
 use App\Models\Member;
 use Illuminate\Http\Request;
+
 
 class BorrowRecordController extends Controller
 {
@@ -14,33 +17,55 @@ class BorrowRecordController extends Controller
      */
     public function index(Request $request)
     {
-        $query = BorrowRecord::with('book', 'member');
+        $search = $request->input('search');
+        $searchType = $request->input('search_type');
+        $tab = $request->input('tab', 'checkedOut');
 
-        if ($request->has('search')) {
-            $search = $request->input('search');
-            $searchType = $request->input('search_type');
+        // Query for checked out records
+        $checkedOutQuery = BorrowRecord::with('book', 'member')
+            ->whereNull('return_date')
+            ->orderBy('created_at', 'desc');
 
+        // Query for history records
+        $historyQuery = BorrowRecord::with('book', 'member')
+            ->whereNotNull('return_date')
+            ->orderBy('created_at', 'desc');
+
+        if ($search) {
             if ($searchType == 'book_id') {
-                $query->whereHas('book', function ($q) use ($search) {
+                $checkedOutQuery->whereHas('book', function ($q) use ($search) {
+                    $q->where('id', 'like', "%$search%");
+                });
+                $historyQuery->whereHas('book', function ($q) use ($search) {
                     $q->where('id', 'like', "%$search%");
                 });
             } elseif ($searchType == 'ic_no') {
-                $query->where('ic_no', 'like', "%$search%");
+                $checkedOutQuery->whereHas('member', function ($q) use ($search) {
+                    $q->where('ic_no', 'like', "%$search%");
+                });
+                $historyQuery->whereHas('member', function ($q) use ($search) {
+                    $q->where('ic_no', 'like', "%$search%");
+                });
             }
         }
 
-        // Get today's date
-        $today = \Carbon\Carbon::today()->toDateString();
+        if ($tab == 'history') {
+            $historyRecords = $historyQuery->paginate(7, ['*'], 'history');
+            $checkedOutRecords = $checkedOutQuery->paginate(7, ['*'], 'checked-out');
+        } else {
+            $checkedOutRecords = $checkedOutQuery->paginate(7, ['*'], 'checked-out');
+            $historyRecords = $historyQuery->paginate(7, ['*'], 'history');
+        }
 
-        // Separate records into checked out and history
-        $checkedOutRecords = $query->whereNull('return_date')->paginate(10, ['*'], 'checked-out');
-        $historyRecords = BorrowRecord::with('book', 'member')
-            ->whereNotNull('return_date')
-            ->where('return_date', '<=', $today)
-            ->paginate(10, ['*'], 'history');
-
-        return view('borrow_records.index', compact('checkedOutRecords', 'historyRecords'));
+        return view('borrow_records.index', compact('checkedOutRecords', 'historyRecords', 'tab'));
     }
+
+
+
+
+
+
+
 
 
 
@@ -53,14 +78,23 @@ class BorrowRecordController extends Controller
      */
     public function create()
     {
-        $books = Book::all();
+        // Get all books that are not currently borrowed
+        $books = Book::whereDoesntHave('borrowRecords', function ($query) {
+            $query->whereNull('return_date');
+        })->get();
+
+
         $members = Member::all();
         return view('borrow_records.create', compact('books', 'members'));
     }
 
+
     /**
      * Store a newly created borrow record in storage.
      */
+// BorrowRecordController.php
+
+
     public function store(Request $request)
     {
         $request->validate([
@@ -69,16 +103,24 @@ class BorrowRecordController extends Controller
             'borrow_date' => 'required|date',
         ]);
 
+
         $book = Book::findOrFail($request->book_id);
+
+
         // Check if the book is currently borrowed
         if (BorrowRecord::where('book_id', $book->id)->whereNull('return_date')->exists()) {
             return back()->withErrors(['msg' => 'This book is currently borrowed.']);
         }
 
+
         BorrowRecord::create($request->all());
+
 
         return redirect()->route('borrow-records.index');
     }
+
+
+
 
     /**
      * Show the form for editing the specified borrow record.
@@ -89,6 +131,7 @@ class BorrowRecordController extends Controller
         $members = Member::all();
         return view('borrow_records.edit', compact('borrowRecord', 'books', 'members'));
     }
+
 
     /**
      * Update the specified borrow record in storage.
@@ -101,10 +144,13 @@ class BorrowRecordController extends Controller
             'borrow_date' => 'required|date',
         ]);
 
+
         $borrowRecord->update($request->all());
+
 
         return redirect()->route('borrow-records.index');
     }
+
 
     /**
      * Remove the specified borrow record from storage.
@@ -113,8 +159,10 @@ class BorrowRecordController extends Controller
     {
         $borrowRecord->delete();
 
+
         return redirect()->route('borrow-records.index');
     }
+
 
     /**
      * Display the specified borrow record.
@@ -123,6 +171,9 @@ class BorrowRecordController extends Controller
     {
         return view('borrow_records.show', compact('borrowRecord'));
     }
+
+
+
 
 
 

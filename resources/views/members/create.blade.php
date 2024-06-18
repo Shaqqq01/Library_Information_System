@@ -4,24 +4,28 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <h1 class="mb-4 text-center">Add New Volunteer</h1>
+                <h1 class="mb-4 text-center">Add New Member</h1>
                 <div class="card">
                     <div class="card-body">
-                        <form action="{{ route('volunteers.store') }}" method="POST">
+                        <form action="{{ route('members.store') }}" method="POST">
                             @csrf
                             <div class="form-group">
                                 <label for="name">Name</label>
                                 <input type="text" name="name" id="name" class="form-control" required>
                             </div>
                             <div class="form-group">
-                                <label for="email">Email</label>
-                                <input type="email" name="email" id="email" class="form-control" required>
+                                <label for="ic_no">IC No</label>
+                                <input type="text" name="ic_no" id="ic_no" class="form-control" required>
                             </div>
                             <div class="form-group">
-                                <label for="password">Password</label>
-                                <input type="password" name="password" id="password" class="form-control" required>
+                                <label for="address">Address</label>
+                                <input type="text" name="address" id="address" class="form-control" required>
                             </div>
-                            <button type="submit" class="btn btn-primary">Add Volunteer</button>
+                            <div class="form-group">
+                                <label for="contact_information">Contact Information</label>
+                                <input type="text" name="contact_information" id="contact_information" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Member</button>
                         </form>
                     </div>
                 </div>
