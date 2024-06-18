@@ -4,19 +4,19 @@
     <div class="container">
         <div class="row">
             <div class="col-md-4 member-list">
-                <div class="d-flex align-items-center mb-3">
+                <form method="GET" action="{{ route('members.index') }}" class="d-flex align-items-center mb-3">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search by name">
-                        <button class="btn btn-primary"><i class="fas fa-search"></i></button>
+                        <input type="text" name="search" class="form-control" placeholder="Search by name" value="{{ request('search') }}">
+                        <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
                     </div>
                     <a href="{{ route('members.create') }}" class="btn btn-success ms-2 add-member-btn">
-                        <i class="fas fa-plus"></i>Add Member
+                        <i class="fas fa-plus"></i> Add Member
                     </a>
-                </div>
+                </form>
                 <ul class="list-group">
                     @foreach($members as $member)
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <a href="{{ route('members.show', $member->id) }}">
+                            <a href="{{ route('members.show', ['member' => $member->id, 'search' => request('search')]) }}">
                                 <h5>{{ $member->name }}</h5>
                             </a>
                             <div class="dropdown">
@@ -45,53 +45,36 @@
 
                     <h2 class="mt-4">Borrowing History</h2>
                     <table class="table">
-                        <thead>
+                        <thead class="table-header-gray">
                         <tr>
                             <th>Title</th>
                             <th>Author</th>
-                            <th>Due Date</th>
+                            <th>Borrowing Date</th>
+                            <th>Return Date</th>
                             <th>Status</th>
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($selectedMember->borrowRecords as $record)
+                        @foreach($borrowRecords as $record)
                             <tr>
                                 <td>{{ $record->book->title }}</td>
                                 <td>{{ $record->book->author }}</td>
-                                <td>{{ $record->due_date }}</td>
+                                <td>{{ \Carbon\Carbon::parse($record->borrow_date)->format('M d, Y') }}</td>
+                                <td class="{{ $record->return_date ? '' : 'greyed-out-text' }}">{{ $record->return_date ?? 'Not Confirmed' }}</td>
                                 <td>
-                                    @if($record->status == 'returned')
+                                    @if($record->return_date)
                                         <span class="badge badge-returned">Returned</span>
-                                    @elseif($record->status == 'overdue')
-                                        <span class="badge badge-overdue">Overdue</span>
                                     @else
-                                        <span class="badge badge-not-confirmed">Not Confirmed</span>
+                                        <span class="badge badge-checked-out">Checked Out</span>
                                     @endif
                                 </td>
                             </tr>
                         @endforeach
                         </tbody>
                     </table>
-
-                    <h2 class="mt-4">Fine History</h2>
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Amount</th>
-                            <th>Note</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach($selectedMember->fines as $fine)
-                            <tr>
-                                <td>{{ $fine->date }}</td>
-                                <td>{{ $fine->amount }}</td>
-                                <td>{{ $fine->note }}</td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
+                    <div class="d-flex justify-content-center mt-3">
+                        {{ $borrowRecords->appends(['search' => request('search')])->links('pagination::bootstrap-4') }}
+                    </div>
                 @else
                     <p>Select a member to view details</p>
                 @endif

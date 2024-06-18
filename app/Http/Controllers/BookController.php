@@ -12,11 +12,12 @@ class BookController extends Controller
      */
     public function index(Request $request)
     {
+        // Search for something similar to that
         $search = $request->input('search');
         $books = Book::where('title', 'like', "%{$search}%")
             ->orWhere('author', 'like', "%{$search}%")
             ->paginate(7);
-
+        // dont understand the search
         return view('books.index', compact('books', 'search'));
     }
 

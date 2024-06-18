@@ -22,7 +22,7 @@
     <!-- Custom CSS -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 
-    <!-- Inline Custom CSS (from the document) -->
+    <!-- Inline Custom CSS -->
     <style>
         body {
             background-color: #f8f9fa;
@@ -60,6 +60,9 @@
         .mr-3 {
             margin-right: 1rem !important;
         }
+        .greyed-out-text {
+            color: #6c757d; /* Slightly greyed out color */
+        }
         .table .badge {
             display: inline-block;
             padding: 0.5em 1em;
@@ -79,6 +82,14 @@
         .table .badge-checked-out {
             background-color: #e9ecef;
             color: #dc3545;
+        }
+        .table .badge-returned {
+            background-color: #e9ecef;
+            color: #28a745; /* Green color for returned */
+        }
+        .table .badge-not-confirmed {
+            background-color: #e9ecef;
+            color: #6c757d;
         }
         .input-group {
             border-radius: 5px;
@@ -122,38 +133,6 @@
         }
         .member-details .detail-item span {
             font-weight: bold;
-        }
-        .badge-returned {
-            background-color: #e9ecef;
-            color: #28a745;
-        }
-        .badge-overdue {
-            background-color: #e9ecef;
-            color: #dc3545;
-        }
-        .badge-not-confirmed {
-            background-color: #e9ecef;
-            color: #6c757d;
-        }
-        .search-bar {
-            margin-bottom: 20px;
-        }
-        .search-bar input {
-            width: calc(100% - 50px);
-            border-radius: 5px 0 0 5px;
-            border-right: 0;
-        }
-        .search-bar button {
-            width: 50px;
-            border-radius: 0 5px 5px 0;
-        }
-        .list-group-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .text-center {
-            text-align: center;
         }
         .btn-primary {
             background-color: #007bff;
@@ -248,12 +227,12 @@
         .pagination li {
             margin: 0 0.25rem;
         }
-        .page-item.active .page-link {
+        .pagination .page-item.active .page-link {
             background-color: #007bff;
             border-color: #007bff;
             color: #fff;
         }
-        .page-link {
+        .pagination .page-link {
             position: relative;
             display: block;
             padding: 0.5rem 0.75rem;
@@ -265,13 +244,17 @@
             border-radius: 0.25rem;
             transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
         }
-        .page-link:hover {
+        .pagination .page-link:hover {
             color: #0056b3;
             text-decoration: none;
             background-color: #e9ecef;
             border-color: #dee2e6;
         }
+        .table-header-gray th {
+            background-color: #f8f9fa; /* Gray color */
+        }
     </style>
+
 </head>
 <body>
 <div id="app">

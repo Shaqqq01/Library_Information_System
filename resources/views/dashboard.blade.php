@@ -31,7 +31,7 @@
             </div>
         </div>
 
-        <h2 class="mb-4">Recently checked out</h2>
+        <h2 class="mb-4">Activities this month</h2>
         <div class="card mb-4">
             <div class="card-body">
                 <table class="table">
@@ -40,7 +40,7 @@
                         <th>Book</th>
                         <th>Member</th>
                         <th>Checked out</th>
-                        <th>Due date</th>
+                        <th>Status</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -48,28 +48,60 @@
                         <tr>
                             <td>{{ $checkout->book->title }}</td>
                             <td>{{ $checkout->member->name }}</td>
-                            <td>{{ \Carbon\Carbon::parse($checkout->borrow_date)->diffForHumans() }}</td>
-                            <td>{{ $checkout->return_date ? \Carbon\Carbon::parse($checkout->return_date)->diffForHumans() : 'Not Returned' }}</td>
+                            <td>{{ \Carbon\Carbon::parse($checkout->borrow_date)->format('M d, Y') }}</td>
+                            <td>
+                                @if($checkout->return_date)
+                                    <span class="badge badge-returned">Returned</span>
+                                @else
+                                    <span class="badge badge-checked-out">Checked Out</span>
+                                @endif
+                            </td>
                         </tr>
                     @endforeach
                     </tbody>
                 </table>
+                @if ($recentCheckouts->hasPages())
+                    <nav>
+                        <ul class="pagination justify-content-center">
+                            {{-- Previous Page Link --}}
+                            @if ($recentCheckouts->onFirstPage())
+                                <li class="page-item disabled" aria-disabled="true">
+                                    <span class="page-link">&laquo;</span>
+                                </li>
+                            @else
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $recentCheckouts->previousPageUrl() }}" rel="prev">&laquo;</a>
+                                </li>
+                            @endif
+
+                            {{-- Pagination Elements --}}
+                            @foreach ($recentCheckouts->links()->elements[0] as $page => $url)
+                                @if ($page == $recentCheckouts->currentPage())
+                                    <li class="page-item active" aria-current="page">
+                                        <span class="page-link">{{ $page }}</span>
+                                    </li>
+                                @else
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                    </li>
+                                @endif
+                            @endforeach
+
+                            {{-- Next Page Link --}}
+                            @if ($recentCheckouts->hasMorePages())
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $recentCheckouts->nextPageUrl() }}" rel="next">&raquo;</a>
+                                </li>
+                            @else
+                                <li class="page-item disabled" aria-disabled="true">
+                                    <span class="page-link">&raquo;</span>
+                                </li>
+                            @endif
+                        </ul>
+                    </nav>
+                @endif
             </div>
         </div>
-
-        <h2 class="mb-4">Recently added books</h2>
-        <div class="d-flex flex-row flex-nowrap overflow-auto">
-            @foreach($recentBooks as $book)
-                <div class="card mr-3" style="min-width: 200px;">
-                    <div class="card-body text-center">
-                        <img src="https://via.placeholder.com/150" class="card-img-top mb-2" alt="{{ $book->title }}">
-                        <h5 class="card-title">{{ $book->title }}</h5>
-                        <p class="card-text">{{ $book->author }}</p>
-                    </div>
-                </div>
-            @endforeach
-        </div>
+        
     </div>
 @endsection
-
-

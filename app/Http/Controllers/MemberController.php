@@ -12,8 +12,14 @@ class MemberController extends Controller
      */
     public function index(Request $request)
     {
-        $members = Member::all();
-        return view('members.index', compact('members'));
+        $search = $request->input('search');
+        if ($search) {
+            $members = Member::where('name', 'like', '%' . $search . '%')->get();
+        } else {
+            $members = Member::all();
+        }
+
+        return view('members.index', compact('members', 'search'));
     }
 
 
@@ -45,11 +51,19 @@ class MemberController extends Controller
     /**
      * Display the specified member.
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        $members = Member::all();
-        $selectedMember = Member::with('borrowRecords.book', 'fines')->findOrFail($id);
-        return view('members.index', compact('members', 'selectedMember'));
+        $search = $request->input('search');
+        if ($search) {
+            $members = Member::where('name', 'like', '%' . $search . '%')->get();
+        } else {
+            $members = Member::all();
+        }
+
+        $selectedMember = Member::with('borrowRecords.book')->findOrFail($id);
+        $borrowRecords = $selectedMember->borrowRecords()->paginate(7);
+
+        return view('members.index', compact('members', 'selectedMember', 'borrowRecords', 'search'));
     }
 
     /**

@@ -23,6 +23,7 @@
                 <table class="table">
                     <thead>
                     <tr>
+                        <th>Book ID</th>
                         <th>Title</th>
                         <th>Authors</th>
                         <th>Availability</th>
@@ -34,6 +35,7 @@
                     <tbody>
                     @foreach($books as $book)
                         <tr>
+                            <td>{{ $book->id }}</td>
                             <td>{{ $book->title }}</td>
                             <td>{{ $book->author }}</td>
                             <td>
@@ -45,7 +47,14 @@
                             </td>
                             <td>{{ $book->published_year }}</td>
                             <td>{{ $book->category }}</td>
-                            <td><a href="{{ route('books.edit', $book->id) }}" class="btn btn-primary btn-sm">Edit</a></td>
+                            <td>
+                                <a href="{{ route('books.edit', $book->id) }}" class="btn btn-primary btn-sm">Edit</a>
+                                <form action="{{ route('books.destroy', $book->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </td>
                         </tr>
                     @endforeach
                     </tbody>

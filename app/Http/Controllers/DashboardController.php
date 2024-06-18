@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Book;
 use App\Models\Member;
 use App\Models\BorrowRecord;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -14,14 +15,12 @@ class DashboardController extends Controller
         $totalBooks = Book::count();
         $totalMembers = Member::count();
         $totalCheckouts = BorrowRecord::count();
-        $recentCheckouts = BorrowRecord::with(['book', 'member'])
-            ->orderBy('borrow_date', 'desc')
-            ->take(5)
-            ->get();
-        $recentBooks = Book::orderBy('created_at', 'desc')
-            ->take(5)
-            ->get();
 
-        return view('dashboard', compact('totalBooks', 'totalMembers', 'totalCheckouts', 'recentCheckouts', 'recentBooks'));
+        $recentCheckouts = BorrowRecord::with(['book', 'member'])
+            ->where('borrow_date', '>=', Carbon::now()->subDays(30))
+            ->orderBy('borrow_date', 'desc')
+            ->paginate(7); // Use paginate instead of take to support pagination
+
+        return view('dashboard', compact('totalBooks', 'totalMembers', 'totalCheckouts', 'recentCheckouts'));
     }
 }
